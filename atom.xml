@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title></title>
+  <link href="http://write.jayferd.us/atom.xml" rel="self"/>
+  <link href="http://write.jayferd.us/"/>
+  <updated>2011-08-02T14:21:11-07:00</updated>
+  <id>http://write.jayferd.us/</id>
+  <author>
+    <name>Jay Adkisson</name>
+    
+  </author>
+
+  
+  <entry>
+    <title>Bash adventures: read a single character, even if it's a newline</title>
+    <link href="http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/"/>
+    <updated>2011-01-12T14:16:00-08:00</updated>
+    <id>http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline</id>
+    <content type="html">&lt;h3&gt;tl;dr&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+getc ch
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$ch&amp;quot;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# don&amp;#39;t forget to quote it!&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;the explanation&lt;/h3&gt;
+
+&lt;p&gt;So it turns out that it's pretty difficult to read exactly one character from a stream.
+From the manual for &lt;code&gt;read&lt;/code&gt; (usually in &lt;code&gt;man builtins&lt;/code&gt;):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;-n nchars
+       read returns after reading nchars characters rather  than
+       waiting  for a complete line of input, but honor a delim‐
+       iter if fewer than nchars characters are read before  the
+       delimiter.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The naive solution, then would be:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;getc ch; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;[$ch]&amp;quot;&lt;/span&gt;;
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;one&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;two&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;three&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;four&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The output from this is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[o]
+[n]
+[e]
+[]
+[t]
+[w]
+[o]
+[]
+[t]
+[h]
+[r]
+[e]
+[e]
+[]
+[f]
+[o]
+[u]
+[r]
+[]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Wait, what happened to the newlines -- why are they returning empty characters?  Well, it turns out there are two things going on here.  Again from the manual:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;The characters in the value of the IFS variable are used to split the line into words.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;...and the newline is in the IFS.  So let's zero out &lt;code&gt;IFS&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;unfortunately, this outputs the same thing, but for a different reason.
+Remember: &lt;code&gt;read -n nchars&lt;/code&gt; will still &amp;quot;honor a delimiter if fewer than &lt;code&gt;nchars&lt;/code&gt; characters are read before the delimiter&amp;quot;.
+And the default delimiter (specified with &lt;code&gt;-d delim&lt;/code&gt;) is the newline.
+So the next solution is to use an empty delimiter.&lt;/p&gt;
+
+&lt;p&gt;Now our &lt;code&gt;getc&lt;/code&gt; looks like:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;(NOTE: the space between the &lt;code&gt;-d&lt;/code&gt; and the &lt;code&gt;''&lt;/code&gt; is not optional.  This confused me the first time I was solving the problem, and I had suggested using the EOF character.  Not only that, I suggested obtaining an EOF with &lt;code&gt;&amp;quot;$(echo -e '\004')&lt;/code&gt;.  The empty delimiter is a better way to solve this particular problem, and &lt;code&gt;$'\004'&lt;/code&gt; is a better way to get an EOF character.)&lt;/p&gt;
+
+&lt;p&gt;Now we get a very different output:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[o]
+[n]
+[e]
+[
+]
+[t]
+[w]
+[o]
+[
+]
+[t]
+[h]
+[r]
+[e]
+[e]
+[
+]
+[f]
+[o]
+[u]
+[r]
+[
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our newlines are back!  Yay!&lt;/p&gt;
+
+&lt;p&gt;There is, however, one more wrinkle, as helpfully pointed out by an anonymous commenter.  &lt;code&gt;read&lt;/code&gt; also likes to let you use backslashes to escape things.  For example, with the current implementation of &lt;code&gt;getc&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;getc ch; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;[$ch]&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;one\&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;two&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Yields the following output:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[o]
+[n]
+[e]
+[t]
+[w]
+[o]
+[
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note how the backslash after &lt;code&gt;one&lt;/code&gt; was interpreted as an escape for the newline that follows.  Luckily, &lt;code&gt;read&lt;/code&gt; comes with an &lt;code&gt;-r&lt;/code&gt; option:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;-r     Backslash does not act as an escape character.  The back‐
+       slash is considered to be part of the line.  In  particu‐
+       lar,  a  backslash-newline pair may not be used as a line
+       continuation.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So the final solution is:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;EDIT 7/19/2011:  Fixes and nuances to the original solution, as provided by &lt;code&gt;:)&lt;/code&gt;.&lt;/p&gt;
+</content>
+  </entry>
+  
+</feed>

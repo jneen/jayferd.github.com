@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Things I Remember to Write Down</title>
+  <title>Things I Remember to Write Down: Bash adventures: read a single character, even if it's a newline</title>
   <meta name="author" content="Jay Adkisson">
   
 
@@ -16,7 +16,7 @@
 
   
 
-  <link rel="canonical" href="http://write.jayferd.us/index.html"/>
+  <link rel="canonical" href="http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/"/>
   <link href="/favicon.png" rel="shortcut icon" />
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,15 +79,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
-
-
-
-  <article>
-    
+      <div>
+<article class="hentry">
+  
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/">Bash Adventures: Read a Single Character, Even if It&#8217;s a Newline</a></h1>
+      <h1 class="entry-title">Bash Adventures: Read a Single Character, Even if It&#8217;s a Newline</h1>
     
     
       <p class="meta">
@@ -103,7 +100,7 @@
   </header>
 
 
-  <div class="entry-content"><h3>tl;dr</h3>
+<div class="entry-content"><h3>tl;dr</h3>
 
 <div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
   <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r -n1 -d <span class="s1">&#39;&#39;</span> <span class="s2">&quot;$@&quot;</span>
@@ -264,22 +261,44 @@ So the next solution is to use an empty delimiter.</p>
 
 <p>EDIT 7/19/2011:  Fixes and nuances to the original solution, as provided by <code>:)</code>.</p>
 </div>
+
+
   <footer>
-    <a rel="full-article" href="/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/">Read on &rarr;</a>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Jay Adkisson</span></span>
+
+      
+
+
+
+
+<time datetime="2011-01-12 14:16:00 -0800" pubdate  updated >Jan 12<span>th</span>, 2011</time>
+
+
+
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/" data-via="jayferd" data-counturl="http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline/" >Tweet</a>
+  
+  
+  <g:plusone size="medium"></g:plusone>
+  
+</div>
+
+    
   </footer>
-
-
-  </article>
-
-<nav role="pagination">
-  <div>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</nav>
+</article>
 
 </div>
+
 <aside role=sidebar>
   
     <section>
@@ -314,6 +333,7 @@ So the next solution is to use an empty delimiter.</p>
 
   
 </aside>
+
 
     </div>
   </div>
