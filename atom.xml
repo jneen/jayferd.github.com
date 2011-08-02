@@ -4,7 +4,7 @@
   <title></title>
   <link href="http://write.jayferd.us/atom.xml" rel="self"/>
   <link href="http://write.jayferd.us/"/>
-  <updated>2011-08-02T14:21:11-07:00</updated>
+  <updated>2011-08-02T15:32:09-07:00</updated>
   <id>http://write.jayferd.us/</id>
   <author>
     <name>Jay Adkisson</name>
@@ -19,13 +19,15 @@
     <id>http://write.jayferd.us/blog/2011/01/12/bash-adventures-read-a-single-character-even-if-its-a-newline</id>
     <content type="html">&lt;h3&gt;tl;dr&lt;/h3&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;getc() {
+  IFS= read -r -n1 -d '' &amp;quot;$@&amp;quot;
+}
 
 getc ch
-&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$ch&amp;quot;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# don&amp;#39;t forget to quote it!&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+echo &amp;quot;$ch&amp;quot; # don't forget to quote it!&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;h3&gt;the explanation&lt;/h3&gt;
@@ -42,19 +44,21 @@ From the manual for &lt;code&gt;read&lt;/code&gt; (usually in &lt;code&gt;man bu
 
 &lt;p&gt;The naive solution, then would be:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;getc() {
+  read -n1 &amp;quot;$@&amp;quot;
+}
 
-&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;getc ch; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;[$ch]&amp;quot;&lt;/span&gt;;
-&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;one&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;two&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;three&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;four&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+while getc ch; do
+  echo &amp;quot;[$ch]&amp;quot;;
+done &amp;lt;&amp;lt;EOF
+one
+two
+three
+four
+EOF&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;The output from this is:&lt;/p&gt;
@@ -87,10 +91,12 @@ From the manual for &lt;code&gt;read&lt;/code&gt; (usually in &lt;code&gt;man bu
 
 &lt;p&gt;...and the newline is in the IFS.  So let's zero out &lt;code&gt;IFS&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;getc() {
+  IFS= read -n1 &amp;quot;$@&amp;quot;
+}&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;unfortunately, this outputs the same thing, but for a different reason.
@@ -100,10 +106,12 @@ So the next solution is to use an empty delimiter.&lt;/p&gt;
 
 &lt;p&gt;Now our &lt;code&gt;getc&lt;/code&gt; looks like:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;getc() {
+  IFS= read -n1 -d '' &amp;quot;$@&amp;quot;
+}&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;(NOTE: the space between the &lt;code&gt;-d&lt;/code&gt; and the &lt;code&gt;''&lt;/code&gt; is not optional.  This confused me the first time I was solving the problem, and I had suggested using the EOF character.  Not only that, I suggested obtaining an EOF with &lt;code&gt;&amp;quot;$(echo -e '\004')&lt;/code&gt;.  The empty delimiter is a better way to solve this particular problem, and &lt;code&gt;$'\004'&lt;/code&gt; is a better way to get an EOF character.)&lt;/p&gt;
@@ -139,13 +147,15 @@ So the next solution is to use an empty delimiter.&lt;/p&gt;
 
 &lt;p&gt;There is, however, one more wrinkle, as helpfully pointed out by an anonymous commenter.  &lt;code&gt;read&lt;/code&gt; also likes to let you use backslashes to escape things.  For example, with the current implementation of &lt;code&gt;getc&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;&lt;span class=&quot;k&quot;&gt;while &lt;/span&gt;getc ch; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;  &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;[$ch]&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;done&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;one\&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;two&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;while getc ch; do
+  echo &amp;quot;[$ch]&amp;quot;
+done &amp;lt;&amp;lt;EOF
+one\
+two
+EOF&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;Yields the following output:&lt;/p&gt;
@@ -170,10 +180,12 @@ So the next solution is to use an empty delimiter.&lt;/p&gt;
 
 &lt;p&gt;So the final solution is:&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;getc&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;read&lt;/span&gt; -r -n1 -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;$@&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+  &lt;pre&gt;
+    &lt;code class='bash'&gt;getc() {
+  IFS= read -r -n1 -d '' &amp;quot;$@&amp;quot;
+}&lt;/code&gt;
+  &lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;EDIT 7/19/2011:  Fixes and nuances to the original solution, as provided by &lt;code&gt;:)&lt;/code&gt;.&lt;/p&gt;
