@@ -102,15 +102,13 @@
 
 <div class="entry-content"><h3>tl;dr</h3>
 
-<div>
-  <pre>
-    <code class='bash'>getc() {
-  IFS= read -r -n1 -d '' &quot;$@&quot;
-}
+<div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r -n1 -d <span class="s1">&#39;&#39;</span> <span class="s2">&quot;$@&quot;</span>
+<span class="o">}</span>
 
 getc ch
-echo &quot;$ch&quot; # don't forget to quote it!</code>
-  </pre>
+<span class="nb">echo</span> <span class="s2">&quot;$ch&quot;</span> <span class="c"># don&#39;t forget to quote it!</span>
+</code></pre>
 </div>
 
 <h3>the explanation</h3>
@@ -127,21 +125,19 @@ From the manual for <code>read</code> (usually in <code>man builtins</code>):</p
 
 <p>The naive solution, then would be:</p>
 
-<div>
-  <pre>
-    <code class='bash'>getc() {
-  read -n1 &quot;$@&quot;
-}
+<div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">read</span> -n1 <span class="s2">&quot;$@&quot;</span>
+<span class="o">}</span>
 
-while getc ch; do
-  echo &quot;[$ch]&quot;;
-done &lt;&lt;EOF
-one
-two
-three
-four
-EOF</code>
-  </pre>
+<span class="k">while </span>getc ch; <span class="k">do</span>
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;[$ch]&quot;</span>;
+<span class="k">done</span> <span class="s">&lt;&lt;EOF</span>
+<span class="s">one</span>
+<span class="s">two</span>
+<span class="s">three</span>
+<span class="s">four</span>
+<span class="s">EOF</span>
+</code></pre>
 </div>
 
 <p>The output from this is:</p>
@@ -174,12 +170,10 @@ EOF</code>
 
 <p>&#8230;and the newline is in the IFS.  So let&#8217;s zero out <code>IFS</code>:</p>
 
-<div>
-  <pre>
-    <code class='bash'>getc() {
-  IFS= read -n1 &quot;$@&quot;
-}</code>
-  </pre>
+<div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -n1 <span class="s2">&quot;$@&quot;</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 <p>unfortunately, this outputs the same thing, but for a different reason.
@@ -189,12 +183,10 @@ So the next solution is to use an empty delimiter.</p>
 
 <p>Now our <code>getc</code> looks like:</p>
 
-<div>
-  <pre>
-    <code class='bash'>getc() {
-  IFS= read -n1 -d '' &quot;$@&quot;
-}</code>
-  </pre>
+<div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -n1 -d <span class="s1">&#39;&#39;</span> <span class="s2">&quot;$@&quot;</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 <p>(NOTE: the space between the <code>-d</code> and the <code>''</code> is not optional.  This confused me the first time I was solving the problem, and I had suggested using the EOF character.  Not only that, I suggested obtaining an EOF with <code>&quot;$(echo -e '\004')</code>.  The empty delimiter is a better way to solve this particular problem, and <code>$'\004'</code> is a better way to get an EOF character.)</p>
@@ -230,15 +222,13 @@ So the next solution is to use an empty delimiter.</p>
 
 <p>There is, however, one more wrinkle, as helpfully pointed out by an anonymous commenter.  <code>read</code> also likes to let you use backslashes to escape things.  For example, with the current implementation of <code>getc</code>:</p>
 
-<div>
-  <pre>
-    <code class='bash'>while getc ch; do
-  echo &quot;[$ch]&quot;
-done &lt;&lt;EOF
-one\
-two
-EOF</code>
-  </pre>
+<div class="highlight"><pre><code class="bash"><span class="k">while </span>getc ch; <span class="k">do</span>
+<span class="k">  </span><span class="nb">echo</span> <span class="s2">&quot;[$ch]&quot;</span>
+<span class="k">done</span> <span class="s">&lt;&lt;EOF</span>
+<span class="s">one\</span>
+<span class="s">two</span>
+<span class="s">EOF</span>
+</code></pre>
 </div>
 
 <p>Yields the following output:</p>
@@ -263,12 +253,10 @@ EOF</code>
 
 <p>So the final solution is:</p>
 
-<div>
-  <pre>
-    <code class='bash'>getc() {
-  IFS= read -r -n1 -d '' &quot;$@&quot;
-}</code>
-  </pre>
+<div class="highlight"><pre><code class="bash">getc<span class="o">()</span> <span class="o">{</span>
+  <span class="nv">IFS</span><span class="o">=</span> <span class="nb">read</span> -r -n1 -d <span class="s1">&#39;&#39;</span> <span class="s2">&quot;$@&quot;</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 <p>EDIT 7/19/2011:  Fixes and nuances to the original solution, as provided by <code>:)</code>.</p>
