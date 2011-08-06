@@ -4,7 +4,7 @@
   <title></title>
   <link href="http://write.jayferd.us/atom.xml" rel="self"/>
   <link href="http://write.jayferd.us/"/>
-  <updated>2011-08-02T21:38:59-07:00</updated>
+  <updated>2011-08-06T07:18:05-07:00</updated>
   <id>http://write.jayferd.us/</id>
   <author>
     <name>Jay Adkisson</name>
@@ -29,6 +29,8 @@ getc ch
 &lt;/div&gt;
 
 &lt;h3&gt;the explanation&lt;/h3&gt;
+
+&lt;!-- more --&gt;
 
 &lt;p&gt;So it turns out that it's pretty difficult to read exactly one character from a stream.
 From the manual for &lt;code&gt;read&lt;/code&gt; (usually in &lt;code&gt;man builtins&lt;/code&gt;):&lt;/p&gt;
